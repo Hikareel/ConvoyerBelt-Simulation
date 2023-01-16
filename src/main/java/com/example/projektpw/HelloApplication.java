@@ -14,11 +14,7 @@ import java.util.LinkedList;
 
 public class HelloApplication extends Application {
     private static final int TRUCK_CAPACITY = 50;
-    private static final int BELT_CAPACITY = 10;
-    private static final int BELT_WEIGHT_LIMIT = 30;
-
-    private int truckLoad = 0;
-    private LinkedList<Integer> bricksOnBelt = new LinkedList<Integer>();
+    public Truck truck;
     private Label truckLoadLabel = new Label("Truck load: 0");
     private Label bricksOnBeltLabel = new Label("Bricks on belt: 0");
 
@@ -50,80 +46,23 @@ public class HelloApplication extends Application {
         primaryStage.setScene(scene);
         primaryStage.show();
 
-        Thread p1 = new Thread(new Worker(1));
-        Thread p2 = new Thread(new Worker(2));
-        Thread p3 = new Thread(new Worker(3));
-        Thread truck = new Thread(new Truck());
+        Truck truck = new Truck(0);
+        Thread p1 = new Thread(new Worker(1, truck));
+        Thread p2 = new Thread(new Worker(2, truck));
+        Thread p3 = new Thread(new Worker(3, truck));
+
+
         p1.start();
         p2.start();
         p3.start();
-        truck.start();
     }
-
-    private class Worker implements Runnable {
-        private int mass;
-
-        public Worker(int mass) {
-            this.mass = mass;
-        }
-
-        @Override
-        public void run() {
-            while (true) {
-                if (bricksOnBelt.size() <= BELT_CAPACITY) {
-                    layBrick(mass);
-                }
-            }
-        }
-    }
-
-    private void layBrick(int mass) {
-        synchronized (bricksOnBelt) {
-            int weight = 0;
-            for(int brick : bricksOnBelt) weight += brick;
-            if (bricksOnBelt.size() < BELT_CAPACITY && weight + mass <= BELT_WEIGHT_LIMIT) {
-                bricksOnBelt.add(mass);
-                updateLabels();
-            }
-        }
-    }
-
     private void updateLabels() {
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
-                truckLoadLabel.setText("Truck load: " + truckLoad);
-                bricksOnBeltLabel.setText("Bricks on belt: " + bricksOnBelt.size());
+                truckLoadLabel.setText("Truck load: ");
+                bricksOnBeltLabel.setText("Bricks on belt: ");
             }
         });
     }
-
-    private class Truck implements Runnable {
-
-        private int truckLoad = 0;
-
-        @Override
-        public void run() {
-            while(true){
-                loadTruck();
-                updateLabels();
-            }
-        }
-    }
-
-    private void loadTruck() {
-        synchronized (bricksOnBelt) {
-            if(!bricksOnBelt.isEmpty()) {
-                int brick = bricksOnBelt.removeFirst();
-                truckLoad += brick;
-                if (truckLoad >= TRUCK_CAPACITY - 2 && truckLoad <= TRUCK_CAPACITY) {
-                    truckLoad = 0;
-                    System.out.println("Truck is full, new truck is ready.");
-                    updateLabels();
-                }
-            }
-        }
-    }
-
-
 }
