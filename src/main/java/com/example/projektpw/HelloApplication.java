@@ -3,66 +3,113 @@ package com.example.projektpw;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
+import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
+import javafx.geometry.VerticalDirection;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
+import java.io.*;
 import java.util.LinkedList;
+import java.util.Properties;
 
 public class HelloApplication extends Application {
-    private static final int TRUCK_CAPACITY = 50;
+
     public Truck truck;
-    private Label truckLoadLabel = new Label("Truck load: 0");
-    private Label bricksOnBeltLabel = new Label("Bricks on belt: 0");
+    public  int BELT_CAPACITY;
+    public  int BELT_WEIGHT_LIMIT;
+    public  int TRUCK_CAPACITY;
+    public static Label truckLoadLabel = new Label("Truck load: 0");
+    public static Label truckCountLabel = new Label("Truck count: 0");
+    public static Label bricksOnBeltLabel = new Label("Bricks on belt: 0");
+    private Label P1label = new Label("P1");
+    private Label P2label = new Label("P2");
+    private Label P3label = new Label("P3");
 
     public static void main(String[] args) {
         launch(args);
     }
 
     public void start(Stage primaryStage) {
-        primaryStage.setTitle("Conveyor Belt Simulator");
+        readConfig();
+        primaryStage.setTitle("Symulator taśmy transportowej");
 
-        VBox root = new VBox();
+        HBox root = new HBox();
         root.setPadding(new Insets(10));
-        root.setSpacing(10);
+        root.setSpacing(50);
         root.setAlignment(Pos.CENTER);
 
-        HBox truckLoadBox = new HBox();
-        truckLoadBox.setSpacing(10);
-        truckLoadBox.setAlignment(Pos.CENTER);
-        truckLoadBox.getChildren().addAll(truckLoadLabel);
+        VBox truckBoxMain = createTruckBoxMain();
+        VBox bricksOnBeltBoxMain = createBricksOnBeltBoxMain();
+        VBox workerBox = createWorkerBox();
 
-        HBox bricksOnBeltBox = new HBox();
-        bricksOnBeltBox.setSpacing(10);
-        bricksOnBeltBox.setAlignment(Pos.CENTER);
-        bricksOnBeltBox.getChildren().addAll(bricksOnBeltLabel);
+        root.getChildren().addAll(truckBoxMain, bricksOnBeltBoxMain, workerBox);
 
-        root.getChildren().addAll(truckLoadBox, bricksOnBeltBox);
-
-        Scene scene = new Scene(root, 300, 200);
+        Scene scene = new Scene(root, 800, 200);
         primaryStage.setScene(scene);
         primaryStage.show();
 
         Truck truck = new Truck(0);
-        Thread p1 = new Thread(new Worker(1, truck));
-        Thread p2 = new Thread(new Worker(2, truck));
-        Thread p3 = new Thread(new Worker(3, truck));
-
+        Thread p1 = new Thread(new Worker(1, truck, BELT_CAPACITY, BELT_WEIGHT_LIMIT, TRUCK_CAPACITY));
+        Thread p2 = new Thread(new Worker(2, truck, BELT_CAPACITY, BELT_WEIGHT_LIMIT, TRUCK_CAPACITY));
+        Thread p3 = new Thread(new Worker(3, truck, BELT_CAPACITY, BELT_WEIGHT_LIMIT, TRUCK_CAPACITY));
 
         p1.start();
         p2.start();
         p3.start();
     }
-    private void updateLabels() {
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                truckLoadLabel.setText("Truck load: ");
-                bricksOnBeltLabel.setText("Bricks on belt: ");
-            }
-        });
+
+    private VBox createTruckBoxMain(){
+        VBox newBox = new VBox();
+        HBox truckCountBox = new HBox();
+        truckCountBox.setAlignment(Pos.TOP_RIGHT);
+        truckCountBox.getChildren().addAll(truckCountLabel);
+        HBox truckLoadBox = new HBox();
+        truckLoadBox.setAlignment(Pos.BOTTOM_RIGHT);
+        truckLoadBox.getChildren().addAll(truckLoadLabel);
+        newBox.getChildren().addAll(truckCountBox,truckLoadBox);
+        newBox.setSpacing(10);
+        newBox.setAlignment(Pos.CENTER_LEFT);
+        return newBox;
     }
+
+    private VBox createBricksOnBeltBoxMain(){
+        VBox newBox = new VBox();
+        HBox beltBox = new HBox();
+        beltBox.setStyle("-fx-border-color: brown; -fx-border-style: solid; -fx-border-width: 2px; -fx-border-radius: 5px;");
+        beltBox.setAlignment(Pos.BASELINE_CENTER);
+        beltBox.setMinSize(400, 100);
+        VBox beltLabel = new VBox();
+        beltLabel.setSpacing(50);
+        beltLabel.setAlignment(Pos.BOTTOM_CENTER);
+        beltLabel.setPadding(new Insets(30));
+        beltLabel.getChildren().addAll(bricksOnBeltLabel);
+        newBox.getChildren().addAll(beltBox, beltLabel);
+        return newBox;
+    }
+
+    private VBox createWorkerBox(){
+        VBox newBox = new VBox();
+        newBox.setSpacing(50);
+        newBox.setAlignment(Pos.CENTER_RIGHT);
+        newBox.getChildren().addAll(P1label, P2label, P3label);
+        return newBox;
+    }
+
+    private void readConfig(){
+        try (InputStream input = new FileInputStream("src/main/resources/config.properties")) {
+            Properties prop = new Properties();
+            prop.load(input);
+            BELT_CAPACITY = Integer.parseInt(prop.getProperty("BELT_CAPACITY"));
+            BELT_WEIGHT_LIMIT = Integer.parseInt(prop.getProperty("BELT_WEIGHT_LIMIT"));
+            TRUCK_CAPACITY = Integer.parseInt(prop.getProperty("TRUCK_CAPACITY"));
+
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+    }
+
 }
