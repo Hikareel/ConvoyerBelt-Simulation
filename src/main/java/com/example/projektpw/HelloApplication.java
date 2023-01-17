@@ -8,6 +8,7 @@ import javafx.geometry.Pos;
 import javafx.geometry.VerticalDirection;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
@@ -15,6 +16,7 @@ import javafx.stage.Stage;
 import java.io.*;
 import java.util.LinkedList;
 import java.util.Properties;
+import java.util.concurrent.TimeUnit;
 
 public class HelloApplication extends Application {
 
@@ -28,7 +30,7 @@ public class HelloApplication extends Application {
     private Label P1label = new Label("P1");
     private Label P2label = new Label("P2");
     private Label P3label = new Label("P3");
-
+    public static ListView<String> belt = new ListView<>();
     public static void main(String[] args) {
         launch(args);
     }
@@ -82,6 +84,7 @@ public class HelloApplication extends Application {
         beltBox.setStyle("-fx-border-color: brown; -fx-border-style: solid; -fx-border-width: 2px; -fx-border-radius: 5px;");
         beltBox.setAlignment(Pos.BASELINE_CENTER);
         beltBox.setMinSize(400, 100);
+        beltBox.getChildren().add(belt);
         VBox beltLabel = new VBox();
         beltLabel.setSpacing(50);
         beltLabel.setAlignment(Pos.BOTTOM_CENTER);

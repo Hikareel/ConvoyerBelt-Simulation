@@ -40,6 +40,12 @@ public class Worker implements Runnable{
                     truck.container + weight + mass <= TRUCK_CAPACITY) {
                 Brick brick = new Brick(brickType);
                 truck.bricksOnBelt.add(brick);
+                Platform.runLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        HelloApplication.belt.getItems().add(String.valueOf(mass));
+                    }
+                });
                 updateLabels();
                 //System.out.println("brick layed by P"+ brickType+", belt weight: "+(weight+mass)+"");
             }else {
@@ -57,6 +63,12 @@ public class Worker implements Runnable{
         synchronized (truck.bricksOnBelt) {
             if (!truck.bricksOnBelt.isEmpty()) {
                 Brick brick = truck.bricksOnBelt.removeFirst();
+                Platform.runLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        HelloApplication.belt.getItems().remove(0);
+                    }
+                });
                 truck.container += brick.mass;
                 updateLabels();
                 //System.out.println("Truck id: "+truck.id+" container: "+truck.container);
