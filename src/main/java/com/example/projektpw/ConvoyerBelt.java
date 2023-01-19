@@ -5,25 +5,26 @@ import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
-import javafx.geometry.VerticalDirection;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 import java.io.*;
 import java.util.LinkedList;
 import java.util.Properties;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.Semaphore;
 
-public class HelloApplication extends Application {
-
+public class ConvoyerBelt extends Application {
+    public static Semaphore lock = new Semaphore(1);
     public Truck truck;
-    public  int BELT_CAPACITY;
-    public  int BELT_WEIGHT_LIMIT;
-    public  int TRUCK_CAPACITY;
+    public static Worker P1;
+    public static Worker P2;
+    public static Worker P3;
+    public static int BELT_CAPACITY;
+    public static int BELT_WEIGHT_LIMIT;
+    public static int TRUCK_CAPACITY;
     public static Label truckLoadLabel = new Label("Truck load: 0");
     public static Label truckCountLabel = new Label("Truck count: 0");
     public static Label bricksOnBeltLabel = new Label("Bricks on belt: 0");
@@ -31,6 +32,7 @@ public class HelloApplication extends Application {
     private Label P2label = new Label("P2");
     private Label P3label = new Label("P3");
     public static ListView<String> belt = new ListView<>();
+    public static final beltOfBricks bricksOnBelt = new beltOfBricks();
     public static void main(String[] args) {
         launch(args);
     }
@@ -55,9 +57,12 @@ public class HelloApplication extends Application {
         primaryStage.show();
 
         Truck truck = new Truck(0);
-        Thread p1 = new Thread(new Worker(1, truck, BELT_CAPACITY, BELT_WEIGHT_LIMIT, TRUCK_CAPACITY));
-        Thread p2 = new Thread(new Worker(2, truck, BELT_CAPACITY, BELT_WEIGHT_LIMIT, TRUCK_CAPACITY));
-        Thread p3 = new Thread(new Worker(3, truck, BELT_CAPACITY, BELT_WEIGHT_LIMIT, TRUCK_CAPACITY));
+        P1 = new Worker(1, truck, BELT_CAPACITY, BELT_WEIGHT_LIMIT, TRUCK_CAPACITY);
+        P2 = new Worker(2, truck, BELT_CAPACITY, BELT_WEIGHT_LIMIT, TRUCK_CAPACITY);
+        P3 = new Worker(3, truck, BELT_CAPACITY, BELT_WEIGHT_LIMIT, TRUCK_CAPACITY);
+        Thread p1 = new Thread(P1);
+        Thread p2 = new Thread(P2);
+        Thread p3 = new Thread(P3);
 
         p1.start();
         p2.start();
@@ -84,6 +89,7 @@ public class HelloApplication extends Application {
         beltBox.setStyle("-fx-border-color: brown; -fx-border-style: solid; -fx-border-width: 2px; -fx-border-radius: 5px;");
         beltBox.setAlignment(Pos.BASELINE_CENTER);
         beltBox.setMinSize(400, 100);
+        belt.setOrientation(Orientation.HORIZONTAL);
         beltBox.getChildren().add(belt);
         VBox beltLabel = new VBox();
         beltLabel.setSpacing(50);
@@ -115,4 +121,14 @@ public class HelloApplication extends Application {
         }
     }
 
+    public static void updateLabels(Truck truck) {
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                ConvoyerBelt.truckLoadLabel.setText("Truck load: " + truck.container);
+                ConvoyerBelt.bricksOnBeltLabel.setText("Bricks on belt: " + bricksOnBelt.getSize());
+                ConvoyerBelt.truckCountLabel.setText("Truck count: " + (truck.id));
+            }
+        });
+    }
 }
