@@ -10,7 +10,7 @@ public class Worker implements Runnable{
     public int BELT_CAPACITY;
     public int BELT_WEIGHT_LIMIT;
     public int TRUCK_CAPACITY;
-    private int czasPrzenoszeniaCegly;
+    private int takeBrickTime;
     public void setTruck(Truck truck) {
         this.truck = truck;
     }
@@ -21,14 +21,14 @@ public class Worker implements Runnable{
         this.BELT_CAPACITY = BELT_CAPACITY;
         this.BELT_WEIGHT_LIMIT = BELT_WEIGHT_LIMIT;
         this.TRUCK_CAPACITY = TRUCK_CAPACITY;
-        this.czasPrzenoszeniaCegly = brickType*100;
+        this.takeBrickTime = brickType*100;
     }
     @Override
     public void run() {
         while (true) {
             //System.out.println("-------"+HelloApplication.bricksOnBelt.size());
             try {
-                Thread.sleep(czasPrzenoszeniaCegly);
+                Thread.sleep(takeBrickTime);
                 ConvoyerBelt.lock.acquire();
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
