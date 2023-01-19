@@ -2,7 +2,7 @@ package com.example.projektpw;
 
 import javafx.application.Platform;
 
-import static com.example.projektpw.ConvoyerBelt.bricksOnBelt;
+import static com.example.projektpw.Main.bricksOnBelt;
 
 public class Worker implements Runnable{
     public String name;
@@ -29,12 +29,12 @@ public class Worker implements Runnable{
             //System.out.println("-------"+HelloApplication.bricksOnBelt.size());
             try {
                 Thread.sleep(takeBrickTime);
-                ConvoyerBelt.lock.acquire();
+                Main.lock.acquire();
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
             layBrick(brickType);
-            ConvoyerBelt.lock.release();
+            Main.lock.release();
         }
     }
     private void layBrick(int mass) {
@@ -52,10 +52,10 @@ public class Worker implements Runnable{
                 Platform.runLater(new Runnable() {
                     @Override
                     public void run() {
-                        ConvoyerBelt.belt.getItems().add(String.valueOf(mass));
+                        Main.belt.getItems().add(String.valueOf(mass));
                     }
                 });
-                ConvoyerBelt.updateLabels(truck);
+                Main.updateLabels(truck);
                 //System.out.println("brick layed by P"+ brickType+", belt weight: "+(weight+mass)+"");
             }else {
                 truck.loadTruck();
