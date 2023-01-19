@@ -56,7 +56,7 @@ public class Worker implements Runnable{
                     }
                 });
                 ConvoyerBelt.updateLabels(truck);
-                System.out.println("brick layed by P"+ brickType+", belt weight: "+(weight+mass)+"");
+                //System.out.println("brick layed by P"+ brickType+", belt weight: "+(weight+mass)+"");
             }else {
                 truck.loadTruck();
             }
