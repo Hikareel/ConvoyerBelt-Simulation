@@ -37,7 +37,7 @@ public class Worker implements Runnable{
             ConvoyerBelt.lock.release();
         }
     }
-    private synchronized void layBrick(int mass) {
+    private void layBrick(int mass) {
         synchronized (bricksOnBelt) {
             int weight = 0;
             for(Brick brick : bricksOnBelt.bricksList) {
