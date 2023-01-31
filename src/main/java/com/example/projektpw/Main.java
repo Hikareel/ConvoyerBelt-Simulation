@@ -9,8 +9,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 
 import java.io.*;
@@ -33,7 +31,6 @@ public class Main extends Application {
     private Label P2label = new Label("P2");
     private Label P3label = new Label("P3");
     public static VBox road = new VBox();
-    public static Rectangle truckRec = new Rectangle(20, 20);
     public static ListView<String> belt = new ListView<>();
     public static final ConvoyerBelt bricksOnBelt = new ConvoyerBelt();
     public static void main(String[] args) {
